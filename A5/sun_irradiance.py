@@ -7,13 +7,14 @@ import matplotlib.pyplot as plt
 from scipy.integrate import quad
 
 # https://en.wikipedia.org/wiki/Atmosphere_of_Earth
+# http://www.spectralcalc.com/blackbody/integrate_planck.html
 
 k = 1.38064852 * 10 ** -23  # botzman J/K
 h = 6.62607004 * 10 ** -34  # m^2 kg / s
 c = 3 * 10 ** 8  # m/s
 T_SUN = 5800  # K
-R_SUN =695510 *1000 # m
-R_ORBIT = 149.60 * 10 **9 # m
+R_SUN = 695510 * 1000  # m
+R_ORBIT = 149.60 * 10 ** 9  # m
 SIGMA = 5.67 * 10 ** -8  # W / (m^2 K^2)
 R_EARTH = 6370 * 1000  # m
 DIVIDE_FACTOR = 4  # to get wats per meter
@@ -22,26 +23,34 @@ R_EARTH_ATMOSPHERE = R_EARTH + ATMOSPHERE_HEIGHT  # m
 
 
 def spectral_radiance(wlength):
-    result = 2*h*c**2/(wlength**5*(e**(h*c/(wlength*k*T_SUN))-1))
+    result = 2 * h * c ** 2 / (wlength ** 5 * (e ** (h * c / (wlength * k * T_SUN)) - 1))
     return result
 
+
 def plot_spectral_radiance():
-    spectrum = np.linspace(0,3*10**-6)
-    plt.plot(spectrum,spectral_radiance(spectrum))
+    spectrum = np.linspace(0, 3 * 10 ** -6)
+    plt.plot(spectrum, spectral_radiance(spectrum))
     plt.show()
 
 
-def mean_solar_irradiance(B_lambda):
-    return B_lambda*pi*R_SUN**2/R_ORBIT**2/10**6/4
-# TODO make above function  on lambda acd chuck it into the integrate
+def mean_solar_irradiance(wlength):
+    return spectral_radiance(wlength) * pi * R_SUN ** 2 / R_ORBIT ** 2 / 10 ** 6 / 4
+
+
 def plot_m_s_i():
-    spectrum = np.linspace(0,10*10**-6)
-    plt.plot(spectrum, mean_solar_irradiance(spectral_radiance(spectrum)))
+    spectrum = np.linspace(0, 10 * 10 ** -6)
+    plt.plot(spectrum * 10 ** 6, mean_solar_irradiance(spectrum))
+    plt.title('Irradiance Sun on Earth')
+    plt.xlabel('wavelength (uM)')
+    plt.ylabel('W(m^2*um) ')
+    plt.legend(['Mean Solar Irradiance at Earth'])
     plt.show()
 
-#plot_m_s_i()
-irradiance_sun=quad(mean_solar_irradiance(spectral_radiance), 0, 100000000)
 
-print(irradiance_sun)
+
+# W/m^2/sr
+radiance_integrated = 2*pi**4*k**4*T_SUN**4/(15*h**3*c**2)
+
+print(radiance_integrated* pi * R_SUN ** 2 / R_ORBIT ** 2 / 10 ** 6 / 4)
 # intensity = irradiance_sun[1]*pi*R_SUN**2/R_ORBIT**2
 # print(intensity)
