@@ -22,7 +22,7 @@ ATMOSPHERE_HEIGHT = 400 * 1000  # m
 R_EARTH_ATMOSPHERE = R_EARTH + ATMOSPHERE_HEIGHT  # m
 N_M_UNITS = 10 ** -9
 U_M_UNITS = 10 ** -6
-
+HC = 1240 #eV * nm
 
 def spectral_radiance(wlength):
     result = 2 * h * c ** 2 / (wlength ** 5 * (e ** (h * c / (wlength * k * T_SUN)) - 1))
@@ -48,6 +48,16 @@ def plot_mean_solar_irradiance_earth():
     plt.legend(['Mean Solar Irradiance at Earth'])
     plt.show()
 
+#TODO DID I JUST DO PART 2? how to ev
+def plot_mean_solar_irradiance_earth_ev():
+    spectrum = np.linspace(0, 3 * 10 ** -6, 1000)
+    plt.plot(spectrum /N_M_UNITS/HC, mean_solar_irradiance(spectrum)/HC)
+    plt.title('Irradiance Sun on Earth')
+    plt.xlabel('wavelength (nm)')
+    plt.ylabel('W(m^2*nm) ')
+    plt.legend(['Mean Solar Irradiance at Earth'])
+    plt.show()
+
 def show_solar_intensity():
     radiance_integrated = 2 * pi ** 4 * k ** 4 * T_SUN ** 4 / (15 * h ** 3 * c ** 2) # W/m^2/sr
     solar_intensity_at_earth = radiance_integrated * pi * R_SUN ** 2 / R_ORBIT ** 2
@@ -55,4 +65,4 @@ def show_solar_intensity():
 
 
 
-plot_mean_solar_irradiance_earth()
+plot_mean_solar_irradiance_earth_ev()
