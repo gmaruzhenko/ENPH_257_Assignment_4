@@ -20,6 +20,8 @@ R_EARTH = 6370 * 1000  # m
 DIVIDE_FACTOR = 4  # to get wats per meter
 ATMOSPHERE_HEIGHT = 400 * 1000  # m
 R_EARTH_ATMOSPHERE = R_EARTH + ATMOSPHERE_HEIGHT  # m
+N_M_UNITS = 10 ** -9
+U_M_UNITS = 10 ** -6
 
 
 def spectral_radiance(wlength):
@@ -34,15 +36,15 @@ def plot_spectral_radiance():
 
 
 def mean_solar_irradiance(wlength):
-    return spectral_radiance(wlength) * pi * R_SUN ** 2 / R_ORBIT ** 2 / 10 ** 6 / 4
+    return spectral_radiance(wlength) * pi * R_SUN ** 2 / R_ORBIT ** 2 * N_M_UNITS / 4
 
 
-def plot_m_s_i():
-    spectrum = np.linspace(0, 10 * 10 ** -6)
-    plt.plot(spectrum * 10 ** 6, mean_solar_irradiance(spectrum))
+def plot_mean_solar_irradiance_earth():
+    spectrum = np.linspace(0, 3 * 10 ** -6 , 1000)
+    plt.plot(spectrum /N_M_UNITS, mean_solar_irradiance(spectrum))
     plt.title('Irradiance Sun on Earth')
-    plt.xlabel('wavelength (uM)')
-    plt.ylabel('W(m^2*um) ')
+    plt.xlabel('wavelength (nm)')
+    plt.ylabel('W(m^2*nm) ')
     plt.legend(['Mean Solar Irradiance at Earth'])
     plt.show()
 
@@ -52,9 +54,5 @@ def show_solar_intensity():
     print("solar intesity = ",solar_intensity_at_earth , "W/m^2")
 
 
-show_solar_intensity()
 
-
-
-# intensity = irradiance_sun[1]*pi*R_SUN**2/R_ORBIT**2
-# print(intensity)
+plot_mean_solar_irradiance_earth()
