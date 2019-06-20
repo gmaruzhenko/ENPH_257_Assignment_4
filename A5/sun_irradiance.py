@@ -46,11 +46,15 @@ def plot_m_s_i():
     plt.legend(['Mean Solar Irradiance at Earth'])
     plt.show()
 
+def show_solar_intensity():
+    radiance_integrated = 2 * pi ** 4 * k ** 4 * T_SUN ** 4 / (15 * h ** 3 * c ** 2) # W/m^2/sr
+    solar_intensity_at_earth = radiance_integrated * pi * R_SUN ** 2 / R_ORBIT ** 2
+    print("solar intesity = ",solar_intensity_at_earth , "W/m^2")
 
 
-# W/m^2/sr
-radiance_integrated = 2*pi**4*k**4*T_SUN**4/(15*h**3*c**2)
+show_solar_intensity()
 
-print(radiance_integrated* pi * R_SUN ** 2 / R_ORBIT ** 2 / 10 ** 6 / 4)
+
+
 # intensity = irradiance_sun[1]*pi*R_SUN**2/R_ORBIT**2
 # print(intensity)
