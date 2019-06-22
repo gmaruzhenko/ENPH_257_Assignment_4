@@ -9,7 +9,7 @@ from scipy.integrate import quad
 # https://en.wikipedia.org/wiki/Atmosphere_of_Earth
 # http://www.spectralcalc.com/blackbody/integrate_planck.html
 
-k = 1.38064852 * 10 ** -23  # botzman J/K
+k = 1.38064852 * 10 ** -23  # botzman m^2*kg/s^2/K
 h = 6.62607004 * 10 ** -34  # m^2 kg / s
 c = 3 * 10 ** 8  # m/s
 T_SUN = 5800  # K
@@ -20,10 +20,11 @@ R_EARTH = 6370 * 1000  # m
 DIVIDE_FACTOR = 4  # to get wats per meter
 ATMOSPHERE_HEIGHT = 400 * 1000  # m
 R_EARTH_ATMOSPHERE = R_EARTH + ATMOSPHERE_HEIGHT  # m
-N_M_UNITS = 10 ** -9
-U_M_UNITS = 10 ** -6
-HC = 1240 #nm per 1 ev
+N_M_UNITS = 10 ** 9 #m
+U_M_UNITS = 10 ** 6 #m
+HC = 1240*N_M_UNITS#nm per 1 ev
 
+# output in W/sr/m^3
 def spectral_radiance(wlength):
     result = 2 * h * c ** 2 / (wlength ** 5 * (e ** (h * c / (wlength * k * T_SUN)) - 1))
     return result
@@ -34,14 +35,14 @@ def plot_spectral_radiance():
     plt.plot(spectrum, spectral_radiance(spectrum))
     plt.show()
 
-
+# output in W/m^3
 def mean_solar_irradiance(wlength):
-    return spectral_radiance(wlength) * pi * R_SUN ** 2 / R_ORBIT ** 2 * N_M_UNITS / DIVIDE_FACTOR
+    return spectral_radiance(wlength) * pi * R_SUN ** 2 / R_ORBIT ** 2 / DIVIDE_FACTOR
 
 
 def plot_mean_solar_irradiance_earth_nm():
     spectrum = np.linspace(0, 3 * 10 ** -6 , 1000)
-    plt.plot(spectrum /N_M_UNITS, mean_solar_irradiance(spectrum)*10**3)
+    plt.plot(spectrum *N_M_UNITS, mean_solar_irradiance(spectrum)/N_M_UNITS)
     plt.title('Irradiance Sun on Earth')
     plt.xlabel('wavelength (nm)')
     plt.ylabel('W/(m^2*nm) ')
@@ -49,12 +50,12 @@ def plot_mean_solar_irradiance_earth_nm():
     plt.show()
 
 
-# TODO DID I JUST DO PART 2? how to ev
 def plot_mean_solar_irradiance_earth_ev():
-    spectrum_nm = np.linspace(1, 1000, 10000)
-    evs = HC / spectrum_nm
-    print(evs)
-    plt.plot(evs / N_M_UNITS, mean_solar_irradiance(spectrum_nm * N_M_UNITS) / HC)
+    spectrum = np.linspace(N_M_UNITS, 5 * 10 ** -9 , 100)
+    print(list(reversed(N_M_UNITS*spectrum)))
+    reversed_spectrum = list(reversed(HC/spectrum))
+    print(reversed_spectrum)
+    plt.plot(list(reversed(HC/spectrum)), list(reversed( mean_solar_irradiance(spectrum)*1240)))
     plt.title('Irradiance Sun on Earth')
     plt.xlabel('wavelength (nm)')
     plt.ylabel('W/(m^2*nm) ')
