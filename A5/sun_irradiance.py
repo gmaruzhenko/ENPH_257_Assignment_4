@@ -53,10 +53,10 @@ def plot_mean_solar_irradiance_earth_nm():
 def plot_mean_solar_irradiance_earth_ev():
     spectrum = np.linspace(100/(N_M_UNITS), 3 * 10 ** -6 , 1000)
     reversed_spectrum = list(reversed(M_TO_EV/spectrum))
-    plt.plot(reversed_spectrum, list(reversed( mean_solar_irradiance(spectrum)*1240)))
+    plt.plot(reversed_spectrum, list(reversed( mean_solar_irradiance(spectrum)*M_TO_EV)))
     plt.title('Irradiance Sun on Earth')
-    plt.xlabel('wavelength (nm)')
-    plt.ylabel('W/(m^2*nm) ')
+    plt.xlabel('Photon Energy [ev]')
+    plt.ylabel('Spectral irradiance [W/(m^2*ev)] ')
     plt.legend(['Mean Solar Irradiance at Earth'])
     plt.show()
 
