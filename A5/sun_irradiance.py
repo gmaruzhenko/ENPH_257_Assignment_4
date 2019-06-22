@@ -22,7 +22,7 @@ ATMOSPHERE_HEIGHT = 400 * 1000  # m
 R_EARTH_ATMOSPHERE = R_EARTH + ATMOSPHERE_HEIGHT  # m
 N_M_UNITS = 10 ** -9
 U_M_UNITS = 10 ** -6
-HC = 1240 #eV * nm
+HC = 1240 #nm per 1 ev
 
 def spectral_radiance(wlength):
     result = 2 * h * c ** 2 / (wlength ** 5 * (e ** (h * c / (wlength * k * T_SUN)) - 1))
@@ -36,33 +36,37 @@ def plot_spectral_radiance():
 
 
 def mean_solar_irradiance(wlength):
-    return spectral_radiance(wlength) * pi * R_SUN ** 2 / R_ORBIT ** 2 * N_M_UNITS / 4
+    return spectral_radiance(wlength) * pi * R_SUN ** 2 / R_ORBIT ** 2 * N_M_UNITS / DIVIDE_FACTOR
 
 
-def plot_mean_solar_irradiance_earth():
+def plot_mean_solar_irradiance_earth_nm():
     spectrum = np.linspace(0, 3 * 10 ** -6 , 1000)
-    plt.plot(spectrum /N_M_UNITS, mean_solar_irradiance(spectrum))
+    plt.plot(spectrum /N_M_UNITS, mean_solar_irradiance(spectrum)*10**3)
     plt.title('Irradiance Sun on Earth')
     plt.xlabel('wavelength (nm)')
-    plt.ylabel('W(m^2*nm) ')
+    plt.ylabel('W/(m^2*nm) ')
     plt.legend(['Mean Solar Irradiance at Earth'])
     plt.show()
 
-#TODO DID I JUST DO PART 2? how to ev
+
+# TODO DID I JUST DO PART 2? how to ev
 def plot_mean_solar_irradiance_earth_ev():
-    spectrum = np.linspace(0, 3 * 10 ** -6, 1000)
-    plt.plot(spectrum /N_M_UNITS/HC, mean_solar_irradiance(spectrum)/HC)
+    spectrum_nm = np.linspace(1, 1000, 10000)
+    evs = HC / spectrum_nm
+    print(evs)
+    plt.plot(evs / N_M_UNITS, mean_solar_irradiance(spectrum_nm * N_M_UNITS) / HC)
     plt.title('Irradiance Sun on Earth')
     plt.xlabel('wavelength (nm)')
-    plt.ylabel('W(m^2*nm) ')
+    plt.ylabel('W/(m^2*nm) ')
     plt.legend(['Mean Solar Irradiance at Earth'])
     plt.show()
+
 
 def show_solar_intensity():
-    radiance_integrated = 2 * pi ** 4 * k ** 4 * T_SUN ** 4 / (15 * h ** 3 * c ** 2) # W/m^2/sr
+    radiance_integrated = 2 * pi ** 4 * k ** 4 * T_SUN ** 4 / (15 * h ** 3 * c ** 2)  # W/m^2/sr
     solar_intensity_at_earth = radiance_integrated * pi * R_SUN ** 2 / R_ORBIT ** 2
-    print("solar intesity = ",solar_intensity_at_earth , "W/m^2")
+    print("solar intesity = ", solar_intensity_at_earth, "W/m^2")
 
 
 
-plot_mean_solar_irradiance_earth_ev()
+plot_mean_solar_irradiance_earth_nm()
