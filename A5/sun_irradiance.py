@@ -28,6 +28,7 @@ M_TO_EV = 1240 / N_M_UNITS  # nm per 1 ev
 ONE_NM = 1 / N_M_UNITS
 END_SOLAR_SPECTRUM = 3 * 10 ** -6
 
+
 # output in W/sr/m^3
 def spectral_radiance(wlength):
     result = 2 * h * c ** 2 / (wlength ** 5 * (e ** (h * c / (wlength * k * T_SUN)) - 1))
@@ -93,6 +94,8 @@ def plot_photovoltaics(E_thresh):
     plt.show()
 
 
+# prints the theoretical efficeny for the photo cell and show the plot of power generated vs total power from sun
+# this assumes that 3/4 solar power lost due to atmopsthere and other factors - change in DIVIDE_FACTOR
 def plot_bandgap_nm():
     # input bangap here
     bangap_cutoff = 1240 / N_M_UNITS
@@ -105,11 +108,13 @@ def plot_bandgap_nm():
     extended = np.concatenate((power_generated, zeros))
     total_spectrum = mean_solar_irradiance(spectrum) / N_M_UNITS
     plt.plot(spectrum * N_M_UNITS, extended)
-    plt.plot(spectrum * N_M_UNITS,total_spectrum)
+    plt.plot(spectrum * N_M_UNITS, total_spectrum)
 
     total_area = trapz(total_spectrum, dx=ONE_NM)
     power_area = trapz(power_generated, dx=ONE_NM)
-    print("Theoretical Efficency for bangap ", bangap_cutoff*N_M_UNITS,"nm is",power_area/total_area*100 , "percent")
+
+    print("Theoretical Efficency for bangap ", bangap_cutoff * N_M_UNITS, "nm is", power_area / total_area * 100,
+          "percent")
 
     plt.title(['Photovoltaecs for bandgap', bangap_cutoff * N_M_UNITS, ' nm'])
     plt.xlabel('wavelength (nm)')
