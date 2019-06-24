@@ -32,6 +32,7 @@ def spectral_radiance(wlength):
     result = 2 * h * c ** 2 / (wlength ** 5 * (e ** (h * c / (wlength * k * T_SUN)) - 1))
     return result
 
+
 def plot_spectral_radiance():
     spectrum = np.linspace(0, 3 * 10 ** -6)
     plt.plot(spectrum, spectral_radiance(spectrum))
@@ -40,7 +41,12 @@ def plot_spectral_radiance():
 
 # output in W/m^3
 def mean_solar_irradiance(wlength):
-    return spectral_radiance(wlength)*wlength * pi * R_SUN ** 2 / R_ORBIT ** 2 / DIVIDE_FACTOR
+    return spectral_radiance(wlength) * pi * R_SUN ** 2 / R_ORBIT ** 2 / DIVIDE_FACTOR
+
+
+def mean_solar_irradiance_with_bandgap(wlength, wcutoff):
+    spect_rad_band = 2 * h * c ** 2 / (wlength ** 4 * (e ** (h * c / (wlength * k * T_SUN)) - 1)) / wcutoff
+    return spect_rad_band * pi * R_SUN ** 2 / R_ORBIT ** 2 / DIVIDE_FACTOR
 
 
 def plot_mean_solar_irradiance_earth_nm():
@@ -77,7 +83,7 @@ def plot_photovoltaics(E_thresh):
     spectrum = np.linspace(100 / N_M_UNITS, nm_cutoff, 100)
     print(nm_cutoff)
     reversed_spectrum = list(reversed(M_TO_EV / spectrum))
-    reversed_mean_solar_irradiance = list(reversed(mean_solar_irradiance(spectrum) * M_TO_EV*(1240)))
+    reversed_mean_solar_irradiance = list(reversed(mean_solar_irradiance(spectrum) * M_TO_EV * (1240)))
     # integral = trapz(reversed_mean_solar_irradiance, x=reversed_spectrum)
 
     plt.plot(reversed_spectrum, reversed_mean_solar_irradiance)
@@ -85,7 +91,43 @@ def plot_photovoltaics(E_thresh):
     plt.ylabel('Power  [W/(m^2*ev)] ')
     plt.show()
 
-plot_photovoltaics(1)
+
+def plot_bandgap_nm():
+    spectrum = np.linspace(0, 3 * 10 ** -6, 1000)
+    plt.plot(spectrum * N_M_UNITS, mean_solar_irradiance_with_bandgap(spectrum, 1240 / N_M_UNITS) / N_M_UNITS)
+    plt.plot(spectrum * N_M_UNITS, mean_solar_irradiance(spectrum) / N_M_UNITS)
+
+    plt.title('Irradiance Sun on Earth')
+    plt.xlabel('wavelength (nm)')
+    plt.ylabel('W/(m^2*nm) ')
+    plt.legend(['Mean Solar Irradiance at Earth'])
+    plt.show()
+
+
+plot_bandgap_nm()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# plot_photovoltaics(1)
 #
 # def get_efficiency(E_thresh):
 #     total = intergrate_power_total()
@@ -131,8 +173,7 @@ plot_photovoltaics(1)
 # plot_photovoltaics(1)
 
 
-
-#def power_past_bandgap(E):
+# def power_past_bandgap(E):
 #     result = 2 * pi * E ** 2 / (h ** 3 * c ** 2 * (e ** (E / (k_ev * T_SUN)) - 1))
 #     return result
 #
