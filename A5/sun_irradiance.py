@@ -109,7 +109,7 @@ def plot_bandgap_nm():
 
     total_area = trapz(total_spectrum, dx=ONE_NM)
     power_area = trapz(power_generated, dx=ONE_NM)
-    print(power_area/total_area)
+    print("Theoretical Efficency for bangap ", bangap_cutoff*N_M_UNITS,"nm is",power_area/total_area*100 , "percent")
 
     plt.title(['Photovoltaecs for bandgap', bangap_cutoff * N_M_UNITS, ' nm'])
     plt.xlabel('wavelength (nm)')
