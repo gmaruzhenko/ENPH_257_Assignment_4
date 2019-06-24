@@ -4,13 +4,14 @@
 import numpy as np
 from numpy import sqrt, sin, cos, pi, e, sqrt, isclose
 import matplotlib.pyplot as plt
-from scipy.integrate import trapz , quad
+from scipy.integrate import trapz, quad
 
 # https://en.wikipedia.org/wiki/Atmosphere_of_Earth
 # http://www.spectralcalc.com/blackbody/integrate_planck.html
+# https://ecee.colorado.edu/~ecen5555/SourceMaterial/ShockleyQueisserLimit1212.pdf
 
 k = 1.38064852 * 10 ** -23  # botzman m^2*kg/s^2/K
-k_ev = 8.617*10**-5 # eV/K
+k_ev = 8.617 * 10 ** -5  # eV/K
 h = 6.62607004 * 10 ** -34  # m^2 kg / s
 c = 3 * 10 ** 8  # m/s
 T_SUN = 5800  # K
@@ -31,7 +32,6 @@ def spectral_radiance(wlength):
     result = 2 * h * c ** 2 / (wlength ** 5 * (e ** (h * c / (wlength * k * T_SUN)) - 1))
     return result
 
-
 def plot_spectral_radiance():
     spectrum = np.linspace(0, 3 * 10 ** -6)
     plt.plot(spectrum, spectral_radiance(spectrum))
@@ -40,7 +40,7 @@ def plot_spectral_radiance():
 
 # output in W/m^3
 def mean_solar_irradiance(wlength):
-    return spectral_radiance(wlength) * pi * R_SUN ** 2 / R_ORBIT ** 2 / DIVIDE_FACTOR
+    return spectral_radiance(wlength)*wlength * pi * R_SUN ** 2 / R_ORBIT ** 2 / DIVIDE_FACTOR
 
 
 def plot_mean_solar_irradiance_earth_nm():
@@ -70,45 +70,55 @@ def show_solar_intensity():
     solar_intensity_at_earth = radiance_integrated * pi * R_SUN ** 2 / R_ORBIT ** 2
     print("solar intesity = ", solar_intensity_at_earth, "W/m^2")
 
+
 # produces a plot of useful power given a band gap energy threshold
 def plot_photovoltaics(E_thresh):
-    nm_cutoff = E_thresh*M_TO_EV
-    spectrum = np.linspace(100/ N_M_UNITS , nm_cutoff, 100)
+    nm_cutoff = E_thresh * M_TO_EV
+    spectrum = np.linspace(100 / N_M_UNITS, nm_cutoff, 100)
     print(nm_cutoff)
     reversed_spectrum = list(reversed(M_TO_EV / spectrum))
-    reversed_mean_solar_irradiance = list(reversed(mean_solar_irradiance(spectrum) * M_TO_EV))
-    integral = trapz(reversed_mean_solar_irradiance,x=reversed_spectrum)
+    reversed_mean_solar_irradiance = list(reversed(mean_solar_irradiance(spectrum) * M_TO_EV*(1240)))
+    # integral = trapz(reversed_mean_solar_irradiance, x=reversed_spectrum)
 
-    print(integral)
-    # plt.plot(reversed_spectrum, list(reversed(mean_solar_irradiance(spectrum) * M_TO_EV)))
-    # plt.title('Irradiance Sun on Earth')
-    # plt.xlabel(' Energy [ev]')
-    # plt.ylabel('Power  [W/(m^2*ev)] ')
-    # plt.show()
-def get_efficiency(E_thresh):
-    total = intergrate_power_total()
-    above_bandgap = intergrate_power(E_thresh)
-    print(total)
-    # print(above_bandgap)
-    efficency = above_bandgap/total
-    return efficency
+    plt.plot(reversed_spectrum, reversed_mean_solar_irradiance)
+    plt.xlabel(' Energy [ev]')
+    plt.ylabel('Power  [W/(m^2*ev)] ')
+    plt.show()
 
-def intergrate_power(E_thresh):
-    nm_cutoff = 1240/E_thresh /N_M_UNITS
-    spectrum = np.linspace(1 / N_M_UNITS, nm_cutoff, 1000)
-    reversed_spectrum = list(reversed(M_TO_EV / spectrum))
-    reversed_mean_solar_irradiance = list(reversed(mean_solar_irradiance(spectrum) * M_TO_EV))
-    integral = trapz(reversed_mean_solar_irradiance, x=reversed_spectrum)
-    return integral
-
-# all area under curve
-def intergrate_power_total():
-    spectrum = np.linspace(100 / N_M_UNITS,  3 * 10 ** -6, 1000)
-    reversed_spectrum = list(reversed(M_TO_EV / spectrum))
-    reversed_mean_solar_irradiance = list(reversed(mean_solar_irradiance(spectrum) * M_TO_EV))
-    integral = trapz(reversed_mean_solar_irradiance, x=reversed_spectrum)
-    return integral
-
+plot_photovoltaics(1)
+#
+# def get_efficiency(E_thresh):
+#     total = intergrate_power_total()
+#     above_bandgap = intergrate_power(E_thresh)
+#     print(total)
+#     print(above_bandgap)
+#     efficency = above_bandgap / total
+#     return efficency
+#
+#
+# def intergrate_power(E_thresh):
+#     nm_cutoff = 1240 / E_thresh / N_M_UNITS
+#     spectrum = np.linspace(100 / N_M_UNITS, nm_cutoff, 1000)
+#     reversed_spectrum = list(reversed(M_TO_EV / spectrum))
+#     reversed_mean_solar_irradiance = list(reversed(mean_solar_irradiance(spectrum) * M_TO_EV))
+#     integral = trapz(reversed_mean_solar_irradiance, x=reversed_spectrum)
+#     plt.plot(reversed_spectrum, reversed_mean_solar_irradiance)
+#     plt.title('Irradiance Sun on Earth')
+#     plt.xlabel(' Energy [ev]')
+#     plt.ylabel('Power  [W/(m^2*ev)] ')
+#     plt.show()
+#     return integral
+#
+#
+# # all area under curve
+# def intergrate_power_total():
+#     spectrum = np.linspace(100 / N_M_UNITS, 3 * 10 ** -6, 1000)
+#     reversed_spectrum_evs = list(reversed(M_TO_EV / spectrum))
+#     reversed_mean_solar_irradiance = list(reversed(mean_solar_irradiance(spectrum) * M_TO_EV))
+#     integral = trapz(reversed_mean_solar_irradiance, x=reversed_spectrum_evs)
+#     return integral
+#
+# plot_mean_solar_irradiance_earth_ev()
 # def intergrand(E):
 #     step =  2*pi*E**2/(h**3*c**2*(e**(E/(k_ev*T_SUN))-1))
 #     print(step)
@@ -117,5 +127,22 @@ def intergrate_power_total():
 # def efficency_photovoltaecs(Egap):
 #     top = Egap
 
-print(intergrate_power(6))
+# print(get_efficiency(2))
 # plot_photovoltaics(1)
+
+
+
+#def power_past_bandgap(E):
+#     result = 2 * pi * E ** 2 / (h ** 3 * c ** 2 * (e ** (E / (k_ev * T_SUN)) - 1))
+#     return result
+#
+# def power_past_bandgap_total(E):
+#     result = 2 * pi * E ** 3 / (h ** 3 * c ** 2 * (e ** (E / (k_ev * T_SUN)) - 1))
+#     return result
+#
+# E_GAP = 1
+# spectrum = np.linspace(0, 5)
+# integral_top = power_past_bandgap(spectrum)*E_GAP
+# integral_botom = power_past_bandgap_total(spectrum)
+# plt.plot(spectrum,integral_top)
+# plt.show()
