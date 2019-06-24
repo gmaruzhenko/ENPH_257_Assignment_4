@@ -25,15 +25,15 @@ REFLECTANCE = 0
 AREA_SPHERE = 4 * pi * RADIUS ** 2  # m^2
 VOLUME_SPHERE = 4/3*pi*RADIUS**3
 
-TIME_STEP = 0.01  # s
+TIME_STEP = 0.1  # s
 
-time_array = np.arange(0,100,TIME_STEP)
+time_array = np.arange(0,40000,TIME_STEP)
 temp_array = np.zeros(len(time_array))
 
-count = 1
+count = 0
 temp_array[count] = T_AVERAGE
-
-while(count < len(time_array)):
+count =1
+while(count  < len(time_array)):
     direct_sunlight = SUN_INTENSITY * pi *RADIUS**2
     #TODO add diffent radiations if sky ! = ground temp
     radiation_environment = SIGMA * AREA_SPHERE * T_AVERAGE**4
@@ -42,11 +42,13 @@ while(count < len(time_array)):
     radiation_loss = SIGMA * AREA_SPHERE * temp_array[count-1]**4
     convection_loss = CONVECTION_COEFF*AREA_SPHERE * (T_AVERAGE-temp_array[count-1])
     p_out = radiation_loss + convection_loss
-    print(p_in, "===========", p_out)
-    temp_array[count] = (p_in - p_out)/(DENSITY * HEAT_CAP * VOLUME_SPHERE)*TIME_STEP
+
+    if isclose(p_in,p_out,0.01):
+        print(temp_array[count-1]," K reached after ",count*TIME_STEP/60/60 ," hours")
+        break
+    temp_array[count] = temp_array[count-1]+(p_in - p_out)/(DENSITY * HEAT_CAP * VOLUME_SPHERE)*TIME_STEP
     count += 1
 
 
-
-plt.plot(time_array,temp_array)
+plt.plot(time_array*TIME_STEP,temp_array)
 plt.show()
