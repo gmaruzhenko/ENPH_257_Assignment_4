@@ -10,6 +10,8 @@ from scipy.integrate import trapz, quad
 # http://www.spectralcalc.com/blackbody/integrate_planck.html
 # https://ecee.colorado.edu/~ecen5555/SourceMaterial/ShockleyQueisserLimit1212.pdf
 
+# http://halas.rice.edu/conversions
+
 k = 1.38064852 * 10 ** -23  # botzman m^2*kg/s^2/K
 k_ev = 8.617 * 10 ** -5  # eV/K
 h = 6.62607004 * 10 ** -34  # m^2 kg / s
@@ -27,7 +29,7 @@ U_M_UNITS = 10 ** 6  # m
 M_TO_EV = 1240 / N_M_UNITS  # nm per 1 ev
 ONE_NM = 1 / N_M_UNITS
 END_SOLAR_SPECTRUM = 3 * 10 ** -6
-
+NORMALIZE_EV_Y = 10*N_M_UNITS**11
 
 # output in W/sr/m^3
 def spectral_radiance(wlength):
@@ -52,7 +54,7 @@ def mean_solar_irradiance(wlength):
 
 
 def ev_mean_solar_irradiance(E):
-    return ev_spectral_radiance(E) * pi * R_SUN ** 2 / R_ORBIT ** 2 / DIVIDE_FACTOR
+    return ev_spectral_radiance(E) * pi * R_SUN ** 2 / R_ORBIT ** 2 / DIVIDE_FACTOR/NORMALIZE_EV_Y
 
 
 def mean_solar_irradiance_with_bandgap(wlength, wcutoff):
@@ -62,7 +64,7 @@ def mean_solar_irradiance_with_bandgap(wlength, wcutoff):
 
 def ev_mean_solar_irradiance_with_bandgap(E, E_gap):
     spect_rad_band = 2 * E ** 3 / (h ** 4 * c ** 3 * (e ** (E / (k_ev * T_SUN)) - 1)) * E_gap
-    return spect_rad_band * pi * R_SUN ** 2 / R_ORBIT ** 2 / DIVIDE_FACTOR
+    return spect_rad_band * pi * R_SUN ** 2 / R_ORBIT ** 2 / DIVIDE_FACTOR /NORMALIZE_EV_Y
 
 
 def plot_mean_solar_irradiance_earth_nm():
@@ -95,9 +97,8 @@ def show_solar_intensity():
 
 # prints the theoretical efficeny for the photo cell and show the plot of power generated vs total power from sun
 # this assumes that 3/4 solar power lost due to atmopsthere and other factors - change in DIVIDE_FACTOR
-def plot_bandgap_nm():
-    # input bangap here
-    bangap_cutoff = 1240 / N_M_UNITS
+# creates photovoltec plots given a bangap in eV
+def plot_bandgap_nm(bangap_cutoff):
 
     spectrum = np.arange(ONE_NM, END_SOLAR_SPECTRUM, ONE_NM)
     spectrum_to_cutoff = np.arange(ONE_NM, bangap_cutoff, ONE_NM)
@@ -106,7 +107,7 @@ def plot_bandgap_nm():
     #append zeros where energy is to low for power generation
     zeros = np.zeros(len(spectrum) - len(spectrum_to_cutoff))
     extended = np.concatenate((power_generated, zeros))
-    
+
     total_spectrum = mean_solar_irradiance(spectrum) / N_M_UNITS
     plt.plot(spectrum * N_M_UNITS, extended)
     plt.plot(spectrum * N_M_UNITS, total_spectrum)
@@ -124,12 +125,12 @@ def plot_bandgap_nm():
     plt.show()
 
 
-def plot_bandgap_ev():
-    # input bangap here
-    e_gap = 1
+# creates photovoltec plots given a bangap in eV
+def plot_bandgap_ev(e_gap):
+    dx = 0.01
 
-    spectrum = np.arange(0.001, 7, 0.01)
-    spectrum_cutoff = np.arange(e_gap, 7, 0.01)
+    spectrum = np.arange(0.001, 7, dx)
+    spectrum_cutoff = np.arange(e_gap, 7, dx)
     total_spectrum = ev_mean_solar_irradiance(spectrum)
     power_generated = ev_mean_solar_irradiance_with_bandgap(spectrum_cutoff, e_gap)
 
@@ -137,8 +138,8 @@ def plot_bandgap_ev():
     zeros = np.zeros(len(spectrum) - len(spectrum_cutoff))
     extended = np.concatenate((zeros, power_generated))
 
-    total_area = trapz(total_spectrum, dx=ONE_NM)
-    power_area = trapz(power_generated, dx=ONE_NM)
+    total_area = trapz(total_spectrum, dx=dx)
+    power_area = trapz(power_generated, dx=dx)
 
     print("Theoretical Efficency for bangap ", e_gap, "eV is", power_area / total_area * 100,
           "percent")
@@ -152,4 +153,5 @@ def plot_bandgap_ev():
     plt.show()
 
 
-plot_bandgap_ev()
+plot_bandgap_ev(1.5)
+plot_bandgap_nm(826.56129 / N_M_UNITS)
