@@ -4,12 +4,13 @@
 import numpy as np
 from numpy import sqrt, sin, cos, pi, e, sqrt, isclose
 import matplotlib.pyplot as plt
-from scipy.integrate import trapz
+from scipy.integrate import trapz , quad
 
 # https://en.wikipedia.org/wiki/Atmosphere_of_Earth
 # http://www.spectralcalc.com/blackbody/integrate_planck.html
 
 k = 1.38064852 * 10 ** -23  # botzman m^2*kg/s^2/K
+k_ev = 8.617*10**-5 # eV/K
 h = 6.62607004 * 10 ** -34  # m^2 kg / s
 c = 3 * 10 ** 8  # m/s
 T_SUN = 5800  # K
@@ -85,22 +86,36 @@ def plot_photovoltaics(E_thresh):
     # plt.ylabel('Power  [W/(m^2*ev)] ')
     # plt.show()
 def get_efficiency(E_thresh):
-    total = intergrate_power(M_TO_EV)
+    total = intergrate_power_total()
     above_bandgap = intergrate_power(E_thresh)
-    print(above_bandgap/total)
-    return
+    print(total)
+    # print(above_bandgap)
+    efficency = above_bandgap/total
+    return efficency
 
 def intergrate_power(E_thresh):
     nm_cutoff = 1240/E_thresh /N_M_UNITS
-    spectrum = np.linspace(100 / N_M_UNITS, nm_cutoff, 100)
+    spectrum = np.linspace(1 / N_M_UNITS, nm_cutoff, 1000)
     reversed_spectrum = list(reversed(M_TO_EV / spectrum))
     reversed_mean_solar_irradiance = list(reversed(mean_solar_irradiance(spectrum) * M_TO_EV))
     integral = trapz(reversed_mean_solar_irradiance, x=reversed_spectrum)
     return integral
 
+# all area under curve
+def intergrate_power_total():
+    spectrum = np.linspace(100 / N_M_UNITS,  3 * 10 ** -6, 1000)
+    reversed_spectrum = list(reversed(M_TO_EV / spectrum))
+    reversed_mean_solar_irradiance = list(reversed(mean_solar_irradiance(spectrum) * M_TO_EV))
+    integral = trapz(reversed_mean_solar_irradiance, x=reversed_spectrum)
+    return integral
 
-print(intergrate_power(1))
-print(intergrate_power(2))
+# def intergrand(E):
+#     step =  2*pi*E**2/(h**3*c**2*(e**(E/(k_ev*T_SUN))-1))
+#     print(step)
+#     return step
 
-print(intergrate_power(3))
+# def efficency_photovoltaecs(Egap):
+#     top = Egap
+
+print(intergrate_power(6))
 # plot_photovoltaics(1)
