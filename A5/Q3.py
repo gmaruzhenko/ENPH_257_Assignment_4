@@ -35,7 +35,7 @@ while count < len(time_array):
     direct_sunlight = SUN_INTENSITY * pi * RADIUS ** 2
     # UNCOMMENT FOR SINGLE COMPONENT
     # radiation_environment = SIGMA * AREA_SPHERE * T_GROUND ** 4
-    radiation_environment = SIGMA * AREA_SPHERE / 2 * T_GROUND ** 4 + SIGMA * AREA_SPHERE / 2 * T_SKY ** 4
+    radiation_environment = SIGMA * AREA_SPHERE / 2 * T_GROUND ** 4*EMISSIVITY + SIGMA * AREA_SPHERE / 2 * T_SKY ** 4*EMISSIVITY
     p_in = direct_sunlight + radiation_environment
 
     radiation_loss = SIGMA * AREA_SPHERE * temp_array[count - 1] ** 4
